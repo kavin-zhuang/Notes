@@ -1,0 +1,35 @@
+# 2017.3.30
+
+## Optimize the boot time
+
+If all the BSP functions selected, boot time is 8 seconds.
+
+        +
+        |   startup
+    1s  |
+        |
+        |   MMU inited
+        |
+    1s  |
+        |   before tffsDevCreate
+        |
+        |
+        |
+        |
+    6s  |   flMountVolume()
+        |     
+        |     flashMap()
+        |     
+        |
+        |   after tffsDevCreate
+        |
+        |
+        v
+
+I can't find the read/write interface!
+  
+  With trace32, I found time consume on flashMap(). Can't optimize it.
+    
+## Orgnize the test items
+
+see GUIDE.vsdx
