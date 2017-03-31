@@ -1,0 +1,45 @@
+# MPC8360E出版本
+
+## MMU配置问题
+
+MMU BAT 的 WIMG 属性解释：
+
+  W - 1 = write through, 0 = write back
+  I - 1 = disable cache here
+  M - 在单核系统中，要始终等于0
+  G - 1=禁止推测预取指访问
+  
+我发现如果BL是255M，就会报错，而如果是256就不会，参考BL的编码，就是固定的那么几个。
+
+MMU映射的参数不够，不能指明这是数据CACHE还是指令CACHE。
+
+## Cache功能测试
+
+测试文件：cache_validity.c
+测试结果：没有cache功能
+
+完成。
+
+## MMU测试
+
+完成。
+
+## EthernetBlaster
+
+注意接口是3和4，即默认网段在192.168.3.x或4.x上。我用3口进行测试的。
+
+网卡/SD卡驱动的Cache问题，需要保留一段非Cache区吗？
+
+## IOZONE
+
+看不懂数据，另外数据显示存在问题。
+
+## FOR循环测试
+
+10,000,000 = 16ns 包括CPU的循环和内存访问，带CACHE的。那么循环1s需要多久呢，delay的实现。
+
+## 启动加速
+
+TFFS初始化放到任务里面。
+
+开启了CACHE后，启动速度加快。印象里，有CACHE后，内存访问有10倍的提速。
