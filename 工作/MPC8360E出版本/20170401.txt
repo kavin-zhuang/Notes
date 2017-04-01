@@ -1,0 +1,87 @@
+# MPC8360E出版本
+
+既然要整理测试用例，当然需要写好如何移植。
+
+性能作为一个RTOS的特性存在，需要有一个可以对比的表格。
+
+## POSIX
+
+EMNOTINITED = Error Module NOT INITED
+
+if_EMNOTINITED_Test就够了。注意是UTF-8编码的。
+
+去掉 PUBLIC_CFLAGS 中的-DPENTIUM_PLAT，注意它对代码的影响。
+
+去掉 -D_VXWORKS_6_8 -D_RTP_TEST
+
+MAKEFILE存在很大的问题。
+
+编码也存在问题，需要转化成GBK的编码。
+
+两个文件夹，分别对应LIB1和LIB2，最后合成LIB。
+
+将库附加过来还不够，需要在自引导中显式地调用。
+
+打印的时候有很多.符号，如下所示：
+
+    reworks>pthread_cond_EMNOTINITED_Test
+    pthrtehard_ceoandd_i nicto_EnMdNOTiItNiIoTnED-.v..a.r......i.a.b.l.e. .m
+    odule has not been initilized!
+    {tphrroejeacdt :cReoWonrkdsi_tOtihoenr-Tevsta,rtieastbclaes e:mptohrdeadu_cloned _hianits_ EnMoNtOT IbNeIeTnED ,irneisutlitl:PiAzSS}e
+    !           d
+
+    pthtreharde_acodnd_ desctrooy_nEMNdOTiItNiIoTEnD-.v.a.r.i..a.b...l.e.. ..m.o
+    d{purloeje chta:sRe Wnorokts _bOethereTestn,t eisnticatsie:lptihzreeda!d
+    
+这是因为POSIX实现的内部打印了错误信息，这个错误信息可能是printk打印出来的：
+
+    pthread_cond_init_EMNOTINITED
+    
+    thread condition-variable module has not been initilized!
+
+在核心模块里面
+
+    cond - 任务条件变量
+    rwlock - 
+    
+EMNOTINITED 测试用例是用来测试模块没有初始化会报错的，也就是说报错才能通过测试！！！
+
+出现错误
+
+    rms_create_EMNOTINITED................
+    {project:ReWorks_OtherTest,testcase:rms_create_EMNOTINITED,result:FAIL}
+
+在核心模块-定时器模块中，包含有TIMER,RMS和WDG的实现。
+
+消息队列那里，因为被QUICC驱动依赖，所以没有办法测试模块未初始化的错误了。
+
+Product_Posix包含几乎所有的接口测试，posix_reworks_test，Posix_Test1和Posix_Test2是从中抽取出来的。
+
+Product_Posix编译存在问题，Makefile中find指令用法出错。
+
+## vxWorks
+
+RTP = Real Time Process project
+
+## 比较著名的基准测试（Benchmark Test, 即BMT）
+
+以下来自百度百科
+
+  可测量、可重复、可对比是基准测试的三大原则，其中可测量是指测试的输入和输出之间是可达的，也就是测试过程是可以实现的，并且测试的结果可以量化表现；可重复是指按照测试过程实现的结果是相同的或处于可接受的置信区间之内，而不受测试的时间、地点和执行者的影响；可对比是指一类测试对象的测试结果具有线性关系，测试结果的大小直接决定性能的高低。
+
+  进行基准测试的最好方法是，每次测试改变一个且只改变一个参数。例如，如果想知道增加JVM内存是否会影响应用程序的性能，就逐次递增JVM内存（例如，从1024 MB增至1224 MB，然后是1524 MB，最后是2024 MB），在每个阶段收集结果和环境数据，记录信息，然后转到下一阶段。这样在分析测试结果时就有迹可循。
+  
+  当软件系统中增加了1个新模块，此时需要做基准测试，以判断新的模块对整个软件系统的性能影响。
+  
+  
+
+参考资料：
+
+  * 维基百科 - https://en.wikipedia.org/wiki/Benchmark_(computing)
+  * 中科院PPT - http://prof.ict.ac.cn/DComputing/uploads/2011/DC_2_1_benchmark.pdf
+  * Whetstone - https://en.wikipedia.org/wiki/Whetstone_(benchmark)
+  * Dhrystone - https://en.wikipedia.org/wiki/Dhrystone
+  * 使用UnixBench为Linux跑分 - https://atjason.com/564.html
+  * Linux性能测试UnixBench一键脚本 - https://teddysun.com/245.html
+  * byte-unixbench - https://github.com/kdlucas/byte-unixbench
+  
